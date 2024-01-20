@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab2</title>
+</head>
+
+<body>
+
+    <button onclick="fetchName()">AllNames</button><br><br>
+    <button onclick="health()">Health issues</button>
+    <input type="text" id="healthInput"><br><br>
+    <label><input type="radio" value="Imperial">Imperial</label>
+    <label><input type="radio" value="Metric">Metric</label>
+
+    <button onclick="fetchWeights()">Weight</button><br><br>
+    <button onclick="fetchIntelligenceFriendly()">Intelligence-Friendly</button><br><br>
+    <button onclick="fetchAverageIntelligence()">Average Intelligence</button><br><br>
+    <button onclick="fetchAverageChildFriendlyIntelligence()">Average Intelligence for Child Friendly=4</button><br><br>
+
+    <div id="Jsoncontent"></div>
+    <div id="deliver"></div>
+    <div id="health"></div>
+
+    <script>
+        function fetchName() {
+            var Jsoncontent = document.getElementById("Jsoncontent");
+
+            var breeds_Url = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(breeds_Url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Something went wrong.');
+                    }
+                    return response.json();
+                })
+                .then(list => {
+                    var x = 0;
+                    Object.values(list).forEach(data => {
+                        x++;
+                        Jsoncontent.appendChild(document.createElement('br'));
+                        result = data.name;
+                        Jsoncontent.append(document.createElement('p').innerHTML = result);
+                    });
+
+                    document.getElementById("deliver").innerHTML = "Total Cat: " + x;
+                })
+                .catch(wrong => {
+                    console.error('Wrong fetching JSON:', wrong);
+                });
+        }
+
+        function health() {
+            var healthInputValue = document.getElementById('healthInput').value;
+            var breeds_Url = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(breeds_Url)
+                .then(response => response.json())
+                .then(list => {
+                    var filteredCats = list.filter(cat => cat.health === healthInputValue);
+
+                    filteredCats.forEach(data => {
+                        Jsoncontent.appendChild(document.createElement('p')).innerText = data.name;
+                    });
+
+                    document.getElementById("health").innerText = "Total Cats with Health Issue " + healthInputValue + ": " + filteredCats.length;
+                })
+                .catch(wrong => {
+                    console.error('Error fetching JSON:', wrong);
+                });
+        }
+
+        function fetchWeights() {
+            Jsoncontent.innerHTML = "";
+
+            var breeds_Url = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(breeds_Url)
+                .then(response => response.json())
+                .then(list => {
+                    list.forEach(data => {
+                        Jsoncontent.appendChild(document.createElement('p')).innerText =
+                            '' + data.weight.imperial + ' lbs/ ' + data.weight.metric + ' kg';
+                    });
+
+                    document.getElementById("deliver").innerText = "Weights displayed in Imperial units.";
+                })
+                .catch(wrong => {
+                    console.error('Error fetching JSON:', wrong)
+                });
+        }
+
+
+        function fetchIntelligenceFriendly() {
+            Jsoncontent.innerHTML = "";
+
+            var breeds_Url = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(breeds_Url)
+                .then(response => response.json())
+                .then(list => {
+                    list.forEach(data => {
+                        Jsoncontent.appendChild(document.createElement('p')).innerText =
+                            ' I - ' + data.intelligence + '/5, F - ' + data.child_friendly + '/5';
+                    });
+
+                    document.getElementById("deliver").innerText = "Intelligence and Child-Friendliness factors displayed.";
+                })
+                .catch(wrong => {
+                    console.error('Error fetching JSON:', wrong)
+                });
+        }
+
+        function fetchAverageIntelligence() {
+            Jsoncontent.innerHTMl = "";
+
+            var breeds_Url = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(breeds_Url)
+                .then(response => response.json())
+                .then(list => {
+                    var totalIntelligence = list.reduce((sum, data) => sum + data.intelligence, 0);
+                    var averageIntelligence = totalIntelligence / list.length;
+
+                    Jsoncontent.appendChild(document.createElement('p')).innerText =
+                        'Average Intelligence: ' + averageIntelligence.toFixed(2);
+                    document.getElementById("deliver").innerText = "Average Intelligence displayed.";
+                })
+                .catch(wrong => {
+                    console.wrong('Error fetching JSON:', wrong)
+                });
+        }
+
+        function fetchAverageChildFriendlyIntelligence() {
+            Jsoncontent.innerHTML = "";
+
+            var breeds_Url = "https://api.thecatapi.com/v1/breeds";
+
+            fetch(breeds_Url)
+                .then(response => response.json())
+                .then(list => {
+                    var childFriendlyCats = list.filter(data => data.child_friendly > 3);
+                    var totalChildFriendlyIntelligence = childFriendlyCats.reduce((sum, data) => sum + data.intelligence, 0);
+                    var averageChildFriendlyIntelligence = totalChildFriendlyIntelligence / childFriendlyCats.length;
+
+                    Jsoncontent.appendChild(document.createElement('p')).innerText =
+                        'Average Intelligence for Child Friendly: ' + averageChildFriendlyIntelligence.toFixed(2);
+                    document.getElementById("deliver").innerText = "Average Intelligence for Child Friendly cats displayed.";
+                })
+                .catch(wrong => {
+                    console.wrong('Error fetching JSON:', wrong)
+                });
+        }
+    </script>
+
+</body>
+
+</html>
